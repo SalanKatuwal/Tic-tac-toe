@@ -3,32 +3,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic-Tac-Toe Game</title>
+    <title>Tic-Tac-Toe</title>
+    <meta name="description" content="Play Tic-Tac-Toe against the computer or a friend.">
+    <meta name="theme-color" content="#fbf7ee">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Patrick+Hand&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="msg-container hide">
-        <p id="msg">Winner</p>
-        <button id="newGame">New Game</button>
-    </div>
+    <!-- Landing -->
+    <section class="screen active" id="home">
+        <header class="brand">
+            <h1>Tic Tac Toe</h1>
+            <svg class="scribble" viewBox="0 0 300 24" aria-hidden="true">
+                <path d="M6 15 C 50 6, 95 19, 150 11 S 245 5, 294 13"/>
+                <path d="M30 20 C 90 13, 170 22, 268 16"/>
+            </svg>
+            <p class="tagline">Like the one you used to play at the back of your notebook.</p>
+        </header>
 
-    <main>
-        <h1>Tic-Tac-Toe Game</h1>
-        <div class="container">
-            <div class="game">
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
-                <button class="box"></button>
+        <p class="annotation" aria-hidden="true">
+            pick one!
+            <svg viewBox="0 0 60 50"><path d="M6 6 C 30 4, 46 18, 44 42"/><path d="M34 34 L 44 43 L 52 32"/></svg>
+        </p>
+
+        <div class="notes">
+            <button class="note yellow" data-mode="cpu">
+                <svg class="doodle" viewBox="0 0 64 64" aria-hidden="true">
+                    <path d="M14 22 C 13 40, 15 50, 16 52 C 30 53, 42 52, 50 51 C 51 40, 50 30, 49 21 C 38 20, 24 21, 14 22 Z"/>
+                    <path d="M32 21 L 31 11"/><circle cx="31" cy="8" r="3"/>
+                    <circle cx="24" cy="33" r="2.5"/><circle cx="40" cy="33" r="2.5"/>
+                    <path d="M24 43 C 28 45, 36 45, 40 42"/>
+                    <path d="M14 34 L 8 35 M 50 34 L 56 33"/>
+                </svg>
+                <span class="note-title">vs Computer</span>
+                <span class="note-desc">Easy, medium or hard. Good luck on hard.</span>
+            </button>
+            <button class="note pink" data-mode="pvp">
+                <svg class="doodle" viewBox="0 0 64 64" aria-hidden="true">
+                    <circle cx="20" cy="22" r="9"/><circle cx="44" cy="22" r="9"/>
+                    <path d="M17 21 L 17 22 M 23 21 L 23 22 M 41 21 L 41 22 M 47 21 L 47 22"/>
+                    <path d="M16 26 C 18 28, 22 28, 24 26 M 40 26 C 42 28, 46 28, 48 26"/>
+                    <path d="M6 54 C 8 40, 32 40, 34 54 M 30 54 C 32 40, 56 40, 58 54"/>
+                </svg>
+                <span class="note-title">vs a Friend</span>
+                <span class="note-desc">Two players, one screen. Take turns.</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Match setup -->
+    <section class="screen" id="setup">
+        <div class="card">
+            <button class="link-btn back" data-go="home">&larr; back</button>
+            <h2 id="setupTitle">Game setup</h2>
+
+            <form id="setupForm" autocomplete="off">
+                <label class="line-field cpu-only">
+                    <span>Your name</span>
+                    <input name="cpuName" maxlength="14" placeholder="you">
+                </label>
+
+                <fieldset class="cpu-only">
+                    <legend>I'll play as</legend>
+                    <div class="choices">
+                        <input type="radio" name="symbol" id="symX" value="X" checked>
+                        <label for="symX" class="pen-x">X</label>
+                        <input type="radio" name="symbol" id="symO" value="O">
+                        <label for="symO" class="pen-o">O</label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="cpu-only">
+                    <legend>Difficulty</legend>
+                    <div class="choices">
+                        <input type="radio" name="difficulty" id="dEasy" value="easy">
+                        <label for="dEasy">easy</label>
+                        <input type="radio" name="difficulty" id="dMedium" value="medium" checked>
+                        <label for="dMedium">medium</label>
+                        <input type="radio" name="difficulty" id="dHard" value="hard">
+                        <label for="dHard">hard</label>
+                    </div>
+                </fieldset>
+
+                <label class="line-field pvp-only">
+                    <span>Player <b class="pen-x">X</b></span>
+                    <input name="nameX" maxlength="14" placeholder="player 1">
+                </label>
+                <label class="line-field pvp-only">
+                    <span>Player <b class="pen-o">O</b></span>
+                    <input name="nameO" maxlength="14" placeholder="player 2">
+                </label>
+
+                <button type="submit" class="sketch-btn">Let's play &rarr;</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Game -->
+    <section class="screen" id="game">
+        <div class="game-wrap">
+            <nav class="game-top">
+                <button class="link-btn" id="toMenu">&larr; menu</button>
+                <span class="mode-label" id="modePill">vs a friend</span>
+                <button class="link-btn" id="restartBtn">restart &#8635;</button>
+            </nav>
+
+            <div class="scoreboard">
+                <div class="score x" id="scoreX">
+                    <span class="score-name"><b class="pen-x">X</b> <span id="nameXLabel">Player 1</span></span>
+                    <span class="tally" id="ptsX"></span>
+                </div>
+                <div class="score draw">
+                    <span class="score-name">draws</span>
+                    <span class="tally" id="ptsDraw"></span>
+                </div>
+                <div class="score o" id="scoreO">
+                    <span class="score-name"><b class="pen-o">O</b> <span id="nameOLabel">Player 2</span></span>
+                    <span class="tally" id="ptsO"></span>
+                </div>
+            </div>
+
+            <p class="status" id="status" aria-live="polite"></p>
+
+            <div class="board-wrap">
+                <svg class="grid-lines" id="gridLines" viewBox="0 0 300 300" aria-hidden="true"></svg>
+                <div class="board" id="board" role="group" aria-label="Tic-tac-toe board"></div>
+                <svg class="win-line" viewBox="0 0 300 300" aria-hidden="true">
+                    <path id="winLine" pathLength="1" d=""/>
+                </svg>
+            </div>
+
+            <button class="link-btn" id="resetScores">erase scores</button>
+        </div>
+    </section>
+
+    <!-- Round result -->
+    <div class="overlay" id="result" hidden>
+        <div class="result-note" id="resultNote" role="dialog" aria-modal="true" aria-labelledby="resultTitle">
+            <div class="result-mark" id="resultMark"></div>
+            <h2 id="resultTitle">You win!</h2>
+            <p id="resultText"></p>
+            <div class="result-actions">
+                <button class="sketch-btn" id="playAgain">Play again</button>
+                <button class="link-btn" id="resultMenu">back to menu</button>
             </div>
         </div>
-        <button id="reset">Reset</button>
-    </main>
+    </div>
 
     <script src="script.js"></script>
 </body>
