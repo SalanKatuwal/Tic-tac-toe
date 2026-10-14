@@ -1,67 +1,750 @@
-*{
-    padding: 0;
-    margin: 0;
+:root {
+    --paper: #fbf7ee;
+    --rule: #dbe5ef;
+    --margin: #efb3b3;
+    --ink: #2e2c2a;
+    --pencil: #6f6a63;
+    --blue-pen: #2456a6;
+    --red-pen: #cf3f4f;
+    --highlight: rgba(255, 222, 40, 0.55);
+    --yellow-note: #fff1a6;
+    --pink-note: #ffd8df;
+    --blue-note: #d7eaff;
+    --hand: "Caveat", "Segoe Print", cursive;
+    --body: "Patrick Hand", "Comic Sans MS", cursive;
+    --sketchy: 255px 15px 225px 15px / 15px 225px 15px 255px;
 }
-body{
-    background-color: aqua;
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+body {
+    min-height: 100dvh;
+    font-family: var(--body);
+    font-size: 1.15rem;
+    color: var(--ink);
+    background-color: var(--paper);
+    /* Notebook paper: a red margin line over blue rules */
+    background-image:
+        linear-gradient(90deg, transparent 46px, var(--margin) 46px, var(--margin) 48px, transparent 48px),
+        repeating-linear-gradient(to bottom, transparent 0 33px, var(--rule) 33px 34px);
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 600px) {
+    body {
+        background-image:
+            linear-gradient(90deg, transparent 18px, var(--margin) 18px, var(--margin) 19px, transparent 19px),
+            repeating-linear-gradient(to bottom, transparent 0 33px, var(--rule) 33px 34px);
+    }
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: pointer;
+}
+
+svg {
+    display: block;
+}
+
+:focus-visible {
+    outline: 2px dashed var(--blue-pen);
+    outline-offset: 4px;
+}
+
+.pen-x { color: var(--blue-pen); }
+.pen-o { color: var(--red-pen); }
+
+b.pen-x,
+b.pen-o {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 1.25em;
+    line-height: 1;
+}
+
+/* ---------- Screens ---------- */
+
+.screen {
+    display: none;
+    min-height: 100dvh;
+    padding: 40px 16px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.screen.active {
+    display: flex;
+    animation: settle 0.35s ease-out both;
+}
+
+/* ---------- Landing ---------- */
+
+.brand {
     text-align: center;
 }
-.container{
-    height: 70vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 
+h1 {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: clamp(3.6rem, 13vw, 6rem);
+    line-height: 0.9;
+    transform: rotate(-2deg);
 }
-.game{
-    height: 60vmin;
-    width: 60vmin;
+
+.scribble {
+    width: min(300px, 70vw);
+    margin: 4px auto 0;
+    fill: none;
+    stroke: var(--red-pen);
+    stroke-width: 3;
+    stroke-linecap: round;
+}
+
+.scribble path {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: ink 0.8s ease-out 0.2s forwards;
+}
+
+.scribble path:nth-child(2) {
+    stroke-width: 2;
+    animation-delay: 0.6s;
+}
+
+.tagline {
+    margin-top: 14px;
+    color: var(--pencil);
+    max-width: 30ch;
+    margin-inline: auto;
+}
+
+.annotation {
+    align-self: center;
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    margin: 34px 0 6px -150px;
+    font-family: var(--hand);
+    font-size: 1.6rem;
+    color: var(--red-pen);
+    transform: rotate(-6deg);
+}
+
+.annotation svg {
+    width: 40px;
+    margin-bottom: -18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.notes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 34px 40px;
+    margin-top: 18px;
+}
+
+.note {
+    position: relative;
+    width: 230px;
+    min-height: 220px;
+    padding: 30px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    background: var(--yellow-note);
+    box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.08),
+        0 14px 16px -12px rgba(60, 40, 0, 0.35);
+    transform: rotate(-2.5deg);
+    transition: box-shadow 0.25s ease;
+}
+
+.note.pink {
+    background: var(--pink-note);
+    transform: rotate(2deg);
+}
+
+/* Strip of tape holding the note down */
+.note::before {
+    content: "";
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    width: 86px;
+    height: 26px;
+    margin-left: -43px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    transform: rotate(-4deg);
+}
+
+.note.pink::before { transform: rotate(5deg); }
+
+.note:hover,
+.note:focus-visible {
+    box-shadow:
+        0 2px 3px rgba(0, 0, 0, 0.1),
+        0 26px 34px -10px rgba(60, 40, 0, 0.45);
+}
+
+.doodle {
+    width: 54px;
+    height: 54px;
+    margin-bottom: 8px;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.note-title {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 2.3rem;
+    line-height: 1;
+}
+
+.note-desc {
+    margin-top: 8px;
+    color: #5a554c;
+    line-height: 1.3;
+}
+
+@media (max-width: 600px) {
+    .annotation { margin-left: -90px; }
+}
+
+/* ---------- Setup ---------- */
+
+.card {
+    position: relative;
+    width: min(100%, 400px);
+    padding: 22px 26px 30px;
+    background: #fff;
+    box-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.08),
+        0 18px 30px -18px rgba(0, 0, 0, 0.35);
+    transform: rotate(-0.8deg);
+}
+
+.card h2 {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 2.5rem;
+    line-height: 1.1;
+    margin: 6px 0 18px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--margin);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+fieldset {
+    border: 0;
+}
+
+.line-field > span,
+legend {
+    display: block;
+    color: var(--pencil);
+    margin-bottom: 2px;
+}
+
+.line-field input {
+    width: 100%;
+    padding: 2px 2px 4px;
+    font-family: var(--hand);
+    font-size: 1.9rem;
+    font-weight: 500;
+    color: var(--blue-pen);
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid #c9c3b8;
+    border-radius: 0;
+}
+
+.line-field input::placeholder {
+    color: #c3bdb2;
+}
+
+.line-field input:focus {
+    outline: none;
+    border-bottom-color: var(--blue-pen);
+}
+
+.choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+}
+
+.choices input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.choices label {
+    position: relative;
+    padding: 4px 14px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 1.8rem;
+    line-height: 1.2;
+    color: #8d877d;
+    cursor: pointer;
+    transition: color 0.15s;
+}
+
+.choices label:hover { color: var(--ink); }
+.choices label.pen-x:hover,
+.choices input:checked + label.pen-x { color: var(--blue-pen); }
+.choices label.pen-o:hover,
+.choices input:checked + label.pen-o { color: var(--red-pen); }
+
+.choices input:checked + label { color: var(--ink); }
+
+/* Hand-drawn circle around the selected option */
+.choices label::after {
+    content: "";
+    position: absolute;
+    inset: -2px -6px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 60' preserveAspectRatio='none'%3E%3Cpath d='M74 6 C 32 2, 5 15, 8 33 C 11 53, 64 58, 98 49 C 121 42, 117 12, 84 7 C 70 5, 56 8, 46 12' fill='none' stroke='%23cf3f4f' stroke-width='2.5' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    opacity: 0;
+    transform: scale(0.85) rotate(-4deg);
+    transition: opacity 0.15s, transform 0.2s ease-out;
+    pointer-events: none;
+}
+
+.choices input:checked + label::after {
+    opacity: 1;
+    transform: none;
+}
+
+.choices input:focus-visible + label {
+    outline: 2px dashed var(--blue-pen);
+    outline-offset: 2px;
+}
+
+/* ---------- Buttons ---------- */
+
+.sketch-btn {
+    align-self: center;
+    padding: 10px 28px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 1.9rem;
+    line-height: 1.1;
+    background: #fff;
+    border: 2.5px solid var(--ink);
+    border-radius: var(--sketchy);
+    box-shadow: 3px 4px 0 var(--ink);
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.sketch-btn:hover {
+    background: #fff6c4;
+    transform: rotate(-1.5deg);
+}
+
+.sketch-btn:active {
+    transform: translate(2px, 3px);
+    box-shadow: 1px 1px 0 var(--ink);
+}
+
+.link-btn {
+    padding: 6px 4px;
+    color: var(--pencil);
+    text-underline-offset: 4px;
+}
+
+.link-btn:hover {
+    color: var(--ink);
+    text-decoration: underline wavy var(--red-pen);
+}
+
+.card .back {
+    margin-left: -4px;
+}
+
+/* ---------- Game ---------- */
+
+#game {
+    justify-content: flex-start;
+    padding-top: 24px;
+}
+
+.game-wrap {
+    width: min(100%, 400px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+}
+
+.game-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.mode-label {
+    font-family: var(--hand);
+    font-size: 1.45rem;
+    font-weight: 500;
+    color: var(--pencil);
+    white-space: nowrap;
+}
+
+.scoreboard {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 10px;
+    padding: 10px 4px 4px;
+    border-bottom: 2px dashed #d5cfc3;
+}
+
+.score {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.score-name {
+    max-width: 100%;
+    padding: 0 6px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* Highlighter swipe, revealed on the active player */
+    background: linear-gradient(100deg, transparent 2%, var(--highlight) 4%, var(--highlight) 94%, transparent 97%) no-repeat left 60% / 0% 70%;
+    transition: background-size 0.35s ease-out;
+}
+
+.score.draw .score-name {
+    color: var(--pencil);
+    font-weight: 500;
+}
+
+.score.active .score-name {
+    background-size: 100% 70%;
+}
+
+.tally {
+    min-height: 28px;
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 1rem;
+    gap: 4px 8px;
+    font-family: var(--hand);
+    font-size: 1.5rem;
+    color: #b5afa4;
+}
 
+.tally svg {
+    width: 34px;
+    height: 26px;
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.2;
+    stroke-linecap: round;
 }
-.box{
-    height: 17vmin;
-    width: 17vmin;
-    border-radius: 1rem;
-    border: none;
-    box-shadow: 0 0 1rem;
-    background-color: white;
-    font-size: 8vmin;
+
+.tally svg .fresh {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: ink 0.3s ease-out forwards;
 }
-#reset{
-    padding: 1rem;
-    font-size: 5vmin;
-    border: none;
-    border-radius: 1rem;
-    color: white;
-    background-color: hsl(195, 75%, 43%);
-    box-shadow: 0 0 1rem;
+
+.status {
+    min-height: 2.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 2rem;
+    line-height: 1.1;
+    text-align: center;
 }
-.msg-container{
-    height: 100vh;
+
+.status svg {
+    width: 26px;
+    height: 26px;
+    flex: none;
+}
+
+.dots::after {
+    content: "";
+    display: inline-block;
+    width: 1.2em;
+    text-align: left;
+    animation: dots 1.2s steps(4) infinite;
+}
+
+.board-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: 4px auto 0;
+    aspect-ratio: 1;
+}
+
+.board {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    height: 100%;
+}
+
+.grid-lines,
+.win-line {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    fill: none;
+    stroke-linecap: round;
+}
+
+.grid-lines {
+    stroke: var(--ink);
+    stroke-width: 4;
+}
+
+.grid-lines path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: ink 0.35s ease-out forwards;
+}
+
+.grid-lines path:nth-child(2) { animation-delay: 0.12s; }
+.grid-lines path:nth-child(3) { animation-delay: 0.24s; }
+.grid-lines path:nth-child(4) { animation-delay: 0.36s; }
+
+.cell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+}
+
+.board:not(.locked) .cell:not(.filled):hover {
+    background: rgba(255, 222, 40, 0.18);
+}
+
+.board.locked .cell,
+.cell.filled { cursor: default; }
+
+/* Faint pencil preview of the next mark */
+.cell::after {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: clamp(3.5rem, 18vw, 5rem);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.board[data-turn="X"] .cell::after { content: "x"; color: var(--blue-pen); }
+.board[data-turn="O"] .cell::after { content: "o"; color: var(--red-pen); }
+
+.board:not(.locked) .cell:not(.filled):hover::after { opacity: 0.2; }
+
+.cell svg {
+    width: 72%;
+    height: 72%;
+}
+
+.mark {
+    fill: none;
+    stroke-width: 7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.mark.x { stroke: var(--blue-pen); }
+.mark.o { stroke: var(--red-pen); }
+
+.mark path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: ink 0.22s ease-out forwards;
+}
+
+.mark path:nth-child(2) { animation-delay: 0.16s; }
+.mark.o path { animation-duration: 0.4s; }
+
+.board.over .cell:not(.win) svg { opacity: 0.35; transition: opacity 0.4s; }
+
+.win-line path {
+    stroke: var(--ink);
+    stroke-width: 6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    opacity: 0;
+}
+
+.win-line path.show {
+    opacity: 0.85;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.45s ease-out 0.25s, opacity 0s 0.25s;
+}
+
+#resetScores { align-self: center; margin-top: 4px; }
+
+/* ---------- Result note ---------- */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(251, 247, 238, 0.55);
+    animation: fade 0.2s ease both;
+}
+
+.result-note {
+    position: relative;
+    width: min(100%, 320px);
+    padding: 30px 24px 22px;
+    text-align: center;
+    background: var(--yellow-note);
+    box-shadow:
+        0 2px 2px rgba(0, 0, 0, 0.08),
+        0 24px 30px -16px rgba(60, 40, 0, 0.45);
+    transform: rotate(-2deg);
+    animation: slap 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+}
+
+.result-note.x { background: var(--blue-note); }
+.result-note.o { background: var(--pink-note); }
+
+.result-note::before {
+    content: "";
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    width: 96px;
+    height: 26px;
+    margin-left: -48px;
+    background: rgba(255, 255, 255, 0.6);
+    transform: rotate(3deg);
+}
+
+.result-mark {
     display: flex;
     justify-content: center;
-    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+
+.result-mark svg {
+    width: 70px;
+    height: 70px;
+}
+
+.result-note h2 {
+    font-family: var(--hand);
+    font-weight: 700;
+    font-size: 2.8rem;
+    line-height: 1;
+}
+
+.result-note p {
+    margin-top: 8px;
+    color: #57524a;
+    line-height: 1.3;
+}
+
+.result-actions {
+    display: flex;
     flex-direction: column;
-    gap: 1rem;
-   
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
 }
-#msg{
-    font-size: 8vmin;
+
+/* ---------- Animations ---------- */
+
+@keyframes settle {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
 }
-#newGame{
-    padding: 1rem;
-    font-size: 4vmin;
-    border: none;
-    border-radius: 1rem;
-    color: white;
-    background-color: hsl(195, 75%, 43%);
-    box-shadow: 0 0 1rem;
+
+@keyframes fade {
+    from { opacity: 0; }
 }
-.hide{
-    display: none;
+
+@keyframes ink {
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes slap {
+    from { opacity: 0; transform: scale(1.25) rotate(-9deg); }
+}
+
+@keyframes dots {
+    0% { content: ""; }
+    25% { content: "."; }
+    50% { content: ".."; }
+    75% { content: "..."; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0s !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0s !important;
+    }
 }
